@@ -8,23 +8,21 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@hufe921/canvas-editor": "^0.9.116",
+    "@hufe921/canvas-editor-plugin-docx": "0.0.5",
     "core-js": "^3.6.5",
+    "prismjs": "^1.30.0",
     "vue": "^2.6.11",
     "vue-router": "^3.2.0",
     "vuex": "^3.4.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.19",
-    "@vue/cli-plugin-eslint": "~4.5.19",
     "@vue/cli-plugin-router": "~4.5.19",
     "@vue/cli-plugin-vuex": "~4.5.19",
     "@vue/cli-service": "~4.5.19",
-    "@vue/eslint-config-prettier": "^6.0.0",
-    "babel-eslint": "^10.1.0",
-    "eslint": "^6.7.2",
-    "eslint-plugin-prettier": "^3.3.1",
-    "eslint-plugin-vue": "^6.2.2",
-    "prettier": "^2.2.1",
+    "sass": "^1.91.0",
+    "sass-loader": "^10.5.2",
     "vue-template-compiler": "^2.6.11"
   }
 }

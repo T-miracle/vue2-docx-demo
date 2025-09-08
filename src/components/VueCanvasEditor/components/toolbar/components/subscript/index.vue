@@ -1,8 +1,8 @@
 <template>
     <div
         class="menu-item__superscript"
-        :title="`上标(${isApple() ? '⌘' : 'Ctrl'}+Shift+,)`"
-        @click.stop="clickHandler"
+        :title="`下标(${isApple() ? '⌘' : 'Ctrl'}+Shift+.)`"
+        @click="clickHandler"
     >
         <i></i>
     </div>
@@ -10,13 +10,13 @@
 
 <script>
     export default {
-        name: 'Superscript',
+        name: 'Subscript',
         inject: [ 'editorInstance', 'isApple' ],
         methods: {
             clickHandler() {
                 const editor = this.editorInstance();
                 if (editor) {
-                    editor.command.executeSuperscript();
+                    editor.command.executeSubscript();
                 }
             }
         }

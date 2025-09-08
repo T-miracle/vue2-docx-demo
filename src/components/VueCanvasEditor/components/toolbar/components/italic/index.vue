@@ -1,22 +1,22 @@
 <template>
-    <div class="menu-item__bold" :title="title" @click.stop="clickHandler">
+    <div class="menu-item__italic" :title="title" @click="clickHandler">
         <i></i>
     </div>
 </template>
 
 <script>
     export default {
-        name: 'Bold',
+        name: 'Italic',
         inject: [ 'editorInstance', 'isApple' ],
         computed: {
             title() {
-                return `加粗(${ this.isApple() ? '⌘' : 'Ctrl' }+B)`;
+                return `斜体(${ this.isApple() ? '⌘' : 'Ctrl' }+I)`;
             }
         },
         methods: {
             clickHandler() {
                 const instance = this.editorInstance();
-                instance.command.executeBold();
+                instance.command.executeItalic();
             }
         }
     };

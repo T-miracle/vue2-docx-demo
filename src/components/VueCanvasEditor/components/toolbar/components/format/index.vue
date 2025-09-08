@@ -1,24 +1,22 @@
 <template>
-    <div class="menu-item__redo" :title="title" @click.stop="clickHandler">
+    <div class="menu-item__format" :title="title" @click="clickHandler">
         <i></i>
     </div>
 </template>
 
 <script>
     export default {
-        name: "Redo",
+        name: "Format",
         inject: [ 'editorInstance', 'isApple' ],
         computed: {
             title() {
-                return `重做(${ this.isApple() ? '⌘' : 'Ctrl' }+Y)`;
+                return `清除格式`;
             }
         },
         methods: {
             clickHandler() {
-                const editor = this.editorInstance();
-                if (editor) {
-                    editor.command.executeRedo()
-                }
+                const instance = this.editorInstance();
+                instance.command.executeFormat()
             }
         }
     };

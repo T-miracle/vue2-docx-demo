@@ -1,24 +1,19 @@
 <template>
-    <div class="menu-item__undo" :title="title" @click="clickHandler">
+    <div class="menu-item__left" :title="`左对齐(${isApple() ? '⌘' : 'Ctrl'}+L)`" @click="clickHandler">
         <i></i>
     </div>
 </template>
 
 <script>
+    import { RowFlex } from '@hufe921/canvas-editor';
+
     export default {
-        name: 'Undo',
+        name: 'Left',
         inject: [ 'editorInstance', 'isApple' ],
-        computed: {
-            title() {
-                return `撤销(${ this.isApple() ? '⌘' : 'Ctrl' }+Z)`;
-            }
-        },
         methods: {
             clickHandler() {
                 const editor = this.editorInstance();
-                if (editor) {
-                    editor.command.executeUndo()
-                }
+                editor.command.executeRowFlex(RowFlex.LEFT);
             }
         }
     };

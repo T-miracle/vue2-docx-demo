@@ -1,112 +1,117 @@
 <template>
-    <div class="menu-item__block" title="内容块" @click="clickHandler">
-        <i></i>
+    <div class="menu-item">
+        <div
+            ref="search"
+            class="menu-item__search"
+            data-menu="search"
+            :title="`搜索与替换(${isApple() ? '⌘' : 'Ctrl'}+F)`"
+            @click="clickHandler"
+        >
+            <i></i>
+        </div>
+        <div
+            ref="searchCollapse"
+            class="menu-item__search__collapse"
+            data-menu="search"
+        >
+            <div class="menu-item__search__collapse__search">
+                <input ref="searchInput" type="text" @input="searchInputHandler" @keydown="searchInputKeydownHandler"/>
+                <label ref="searchResult" class="search-result"></label>
+                <div class="arrow-left" @click="searchCollapseArrowLeftClickHandler">
+                    <i></i>
+                </div>
+                <div class="arrow-right" @click="searchCollapseArrowRightClickHandler">
+                    <i></i>
+                </div>
+                <span @click="searchCollapseCloseClickHandler">×</span>
+            </div>
+            <div class="menu-item__search__collapse__replace">
+                <input ref="replaceInput" type="text"/>
+                <button @click="searchCollapseReplaceClickHandler">替换</button>
+            </div>
+        </div>
     </div>
 </template>
 
 <script>
-    import { Dialog } from '../../../dialog';
-    import { BlockType, ElementType } from '@hufe921/canvas-editor';
-
     export default {
-        name: 'Block',
+        name: 'Search',
         inject: [ 'editorInstance', 'isApple' ],
         methods: {
             clickHandler() {
+                const searchDom = this.$refs.search;
+                const searchCollapseDom = this.$refs.searchCollapse;
+                const searchInputDom = this.$refs.searchInput;
+
+                searchCollapseDom.style.display = 'block';
+                const bodyRect = document.body.getBoundingClientRect();
+                const searchRect = searchDom.getBoundingClientRect();
+                const searchCollapseRect = searchCollapseDom.getBoundingClientRect();
+                if (searchRect.left + searchCollapseRect.width > bodyRect.width) {
+                    searchCollapseDom.style.right = '0px';
+                    searchCollapseDom.style.left = 'unset';
+                } else {
+                    searchCollapseDom.style.right = 'unset';
+                }
+                searchInputDom.focus();
+            },
+            setSearchResult() {
                 const instance = this.editorInstance();
-                new Dialog({
-                    title: '内容块',
-                    data: [
-                        {
-                            type: 'select',
-                            label: '类型',
-                            name: 'type',
-                            value: 'iframe',
-                            required: true,
-                            options: [
-                                {
-                                    label: '网址',
-                                    value: 'iframe'
-                                },
-                                {
-                                    label: '视频',
-                                    value: 'video'
-                                }
-                            ]
-                        },
-                        {
-                            type: 'number',
-                            label: '宽度',
-                            name: 'width',
-                            placeholder: '请输入宽度（默认页面内宽度）'
-                        },
-                        {
-                            type: 'number',
-                            label: '高度',
-                            name: 'height',
-                            required: true,
-                            placeholder: '请输入高度'
-                        },
-                        {
-                            type: 'input',
-                            label: '地址',
-                            name: 'src',
-                            required: false,
-                            placeholder: '请输入地址'
-                        },
-                        {
-                            type: 'textarea',
-                            label: 'HTML',
-                            height: 100,
-                            name: 'srcdoc',
-                            required: false,
-                            placeholder: '请输入HTML代码（仅网址类型有效）'
-                        }
-                    ],
-                    onConfirm: payload => {
-                        const type = payload.find(p => p.name === 'type')?.value;
-                        if (!type) {
-                            return;
-                        }
-                        const width = payload.find(p => p.name === 'width')?.value;
-                        const height = payload.find(p => p.name === 'height')?.value;
-                        if (!height) {
-                            return;
-                        }
-                        // 地址或HTML代码至少存在一项
-                        const src = payload.find(p => p.name === 'src')?.value;
-                        const srcdoc = payload.find(p => p.name === 'srcdoc')?.value;
-                        const block = {
-                            type: type
-                        };
-                        if (block.type === BlockType.IFRAME) {
-                            if (!src && !srcdoc) {
-                                return;
-                            }
-                            block.iframeBlock = {
-                                src,
-                                srcdoc
-                            };
-                        } else if (block.type === BlockType.VIDEO) {
-                            if (!src) {
-                                return;
-                            }
-                            block.videoBlock = {
-                                src
-                            };
-                        }
-                        const blockElement = {
-                            type: ElementType.BLOCK,
-                            value: '',
-                            height: Number(height),
-                            block
-                        };
-                        if (width) {
-                            blockElement.width = Number(width);
-                        }
-                        instance.command.executeInsertElementList([ blockElement ]);
-                    }
-                });
+                const searchResultDom = this.$refs.searchResult;
+                const result = instance.command.getSearchNavigateInfo();
+                if (result) {
+                    const { index, count } = result;
+                    searchResultDom.innerText = `${ index }/${ count }`;
+                } else {
+                    searchResultDom.innerText = '';
+                }
+            },
+            searchCollapseCloseClickHandler() {
+                const instance = this.editorInstance();
+                const searchCollapseDom = this.$refs.searchCollapse;
+                const searchInputDom = this.$refs.searchInput;
+                const replaceInputDom = this.$refs.replaceInput;
+
+                searchCollapseDom.style.display = 'none';
+                searchInputDom.value = '';
+                replaceInputDom.value = '';
+                instance.command.executeSearch(null);
+                this.setSearchResult();
+            },
+            searchInputHandler() {
+                const instance = this.editorInstance();
+                const searchInputDom = this.$refs.searchInput;
+                instance.command.executeSearch(searchInputDom.value || null)
+                this.setSearchResult()
+            },
+            searchInputKeydownHandler(evt) {
+                if (evt.key === 'Enter') {
+                    const instance = this.editorInstance();
+                    const searchInputDom = this.$refs.searchInput;
+                    instance.command.executeSearch(searchInputDom.value || null)
+                    this.setSearchResult()
+                }
+            },
+            searchCollapseReplaceClickHandler() {
+                const instance = this.editorInstance();
+                const searchInputDom = this.$refs.searchInput;
+                const replaceInputDom = this.$refs.replaceInput;
+
+                const searchValue = searchInputDom.value
+                const replaceValue = replaceInputDom.value
+                if (searchValue && searchValue !== replaceValue) {
+                    instance.command.executeReplace(replaceValue)
+                }
+            },
+            searchCollapseArrowLeftClickHandler() {
+                const instance = this.editorInstance();
+                instance.command.executeSearchNavigatePre()
+                this.setSearchResult()
+            },
+            searchCollapseArrowRightClickHandler() {
+                const instance = this.editorInstance();
+                instance.command.executeSearchNavigateNext()
+                this.setSearchResult()
             }
         }
     };

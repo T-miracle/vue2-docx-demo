@@ -1,22 +1,16 @@
 <template>
-    <div class="menu-item__bold" :title="title" @click="clickHandler">
+    <div class="menu-item__page-break" title="分页符" @click="clickHandler">
         <i></i>
     </div>
 </template>
 
 <script>
     export default {
-        name: 'Bold',
+        name: 'PageBreak',
         inject: [ 'editorInstance', 'isApple' ],
-        computed: {
-            title() {
-                return `加粗(${ this.isApple() ? '⌘' : 'Ctrl' }+B)`;
-            }
-        },
         methods: {
             clickHandler() {
-                const instance = this.editorInstance();
-                instance.command.executeBold();
+                this.editorInstance().command.executePageBreak()
             }
         }
     };

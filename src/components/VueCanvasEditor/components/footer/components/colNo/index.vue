@@ -1,19 +1,19 @@
 <template>
-    <span>行：<span class="row-no">{{ value }}</span></span>
+    <span>列：<span class="col-no">{{ value }}</span></span>
 </template>
 
 <script>
-    import { eventBus, EVENTS } from '@/components/VueCanvasEditor/eventBus';
+    import { eventBus, EVENTS } from '../../../../eventBus';
 
     export default {
-        name: 'RowNo',
+        name: 'ColNo',
         data() {
             return {
                 value: 0
             }
         },
         created() {
-            eventBus.$on(EVENTS.UPDATE_ROW_NO, val => this.value = val);
+            eventBus.$on(EVENTS.UPDATE_COL_NO, val => this.value = val);
         }
     };
 </script>

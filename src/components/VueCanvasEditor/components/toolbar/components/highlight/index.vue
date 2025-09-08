@@ -1,22 +1,22 @@
 <template>
-    <div class="menu-item__italic" :title="title" @click.stop="clickHandler">
+    <div class="menu-item__highlight" title="高亮" @click="clickHandler">
         <i></i>
+        <span></span>
+        <input ref="color" type="color" id="highlight" @input="setColorHandler">
     </div>
 </template>
 
 <script>
     export default {
-        name: 'Italic',
+        name: 'Highlight',
         inject: [ 'editorInstance', 'isApple' ],
-        computed: {
-            title() {
-                return `斜体(${ this.isApple() ? '⌘' : 'Ctrl' }+I)`;
-            }
-        },
         methods: {
             clickHandler() {
+                this.$refs.color.click();
+            },
+            setColorHandler(e) {
                 const instance = this.editorInstance();
-                instance.command.executeItalic();
+                instance.command.executeHighlight(e.target.value);
             }
         }
     };

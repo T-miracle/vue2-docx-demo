@@ -1,18 +1,22 @@
 <template>
-    <div class="menu-item__strikeout" title="删除线(Ctrl+Shift+X)" @click.stop="clickHandler">
+    <div
+        class="menu-item__superscript"
+        :title="`上标(${isApple() ? '⌘' : 'Ctrl'}+Shift+,)`"
+        @click="clickHandler"
+    >
         <i></i>
     </div>
 </template>
 
 <script>
     export default {
-        name: "Strikeout",
+        name: 'Superscript',
         inject: [ 'editorInstance', 'isApple' ],
         methods: {
             clickHandler() {
                 const editor = this.editorInstance();
                 if (editor) {
-                    editor.command.executeStrikeout()
+                    editor.command.executeSuperscript();
                 }
             }
         }

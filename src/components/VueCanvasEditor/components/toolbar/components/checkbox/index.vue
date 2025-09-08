@@ -1,19 +1,26 @@
 <template>
-    <div class="menu-item__center" :title="`居中对齐(${isApple() ? '⌘' : 'Ctrl'}+E)`" @click="clickHandler">
+    <div class="menu-item__checkbox" title="复选框" @click="clickHandler">
         <i></i>
     </div>
 </template>
 
 <script>
-    import { RowFlex } from '@hufe921/canvas-editor';
+    import { ElementType } from '@hufe921/canvas-editor';
 
     export default {
-        name: 'Center',
+        name: 'Checkbox',
         inject: [ 'editorInstance', 'isApple' ],
         methods: {
             clickHandler() {
-                const editor = this.editorInstance();
-                editor.command.executeRowFlex(RowFlex.CENTER);
+                this.editorInstance().command.executeInsertElementList([
+                    {
+                        type: ElementType.CHECKBOX,
+                        checkbox: {
+                            value: false
+                        },
+                        value: ''
+                    }
+                ]);
             }
         }
     };

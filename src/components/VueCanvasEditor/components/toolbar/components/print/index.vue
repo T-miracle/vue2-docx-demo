@@ -1,19 +1,17 @@
 <template>
-    <div class="menu-item__center" :title="`居中对齐(${isApple() ? '⌘' : 'Ctrl'}+E)`" @click="clickHandler">
+    <div class="menu-item__print" data-menu="print" :title="`打印(${isApple() ? '⌘' : 'Ctrl'}+P)`" @click="clickHandler">
         <i></i>
     </div>
 </template>
 
 <script>
-    import { RowFlex } from '@hufe921/canvas-editor';
-
     export default {
-        name: 'Center',
+        name: 'Print',
         inject: [ 'editorInstance', 'isApple' ],
         methods: {
             clickHandler() {
-                const editor = this.editorInstance();
-                editor.command.executeRowFlex(RowFlex.CENTER);
+                const instance = this.editorInstance();
+                instance.command.executePrint()
             }
         }
     };

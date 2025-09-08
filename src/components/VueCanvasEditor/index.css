@@ -456,7 +456,7 @@ ul {
     background: #fff;
     position: relative;
     margin-right: 6px;
-    pointer-events: none;
+    pointer-events: auto;
 }
 
 .table-panel .table-cel.active {

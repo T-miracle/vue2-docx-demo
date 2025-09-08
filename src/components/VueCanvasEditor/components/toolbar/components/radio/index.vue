@@ -1,5 +1,5 @@
 <template>
-    <div class="menu-item__checkbox" title="复选框" @click="clickHandler">
+    <div class="menu-item__radio" title="单选框" @click="clickHandler">
         <i></i>
     </div>
 </template>
@@ -8,19 +8,19 @@
     import { ElementType } from '@hufe921/canvas-editor';
 
     export default {
-        name: 'Checkbox',
-        inject: [ 'editorInstance', 'isApple' ],
+        name: 'Radio',
+        inject: [ 'editorInstance' ],
         methods: {
             clickHandler() {
                 this.editorInstance().command.executeInsertElementList([
                     {
-                        type: ElementType.CHECKBOX,
+                        type: ElementType.RADIO,
                         checkbox: {
                             value: false
                         },
                         value: ''
                     }
-                ]);
+                ])
             }
         }
     };

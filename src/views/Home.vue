@@ -1,18 +1,25 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js App" />
-  </div>
+    <div class="container">
+        <VueCanvasEditor/>
+    </div>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from "@/components/HelloWorld.vue";
+    import VueCanvasEditor from '@/components/VueCanvasEditor/index.vue';
 
-export default {
-  name: "Home",
-  components: {
-    HelloWorld,
-  },
-};
+    export default {
+        name: 'Home',
+        components: { VueCanvasEditor },
+        created() {
+
+        },
+        methods: {}
+    };
 </script>
+
+<style lang="scss">
+    .container {
+        padding: 0;
+        margin: 0;
+    }
+</style>

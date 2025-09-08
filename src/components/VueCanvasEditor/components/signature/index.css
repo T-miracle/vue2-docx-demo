@@ -47,7 +47,7 @@
   height: 16px;
   cursor: pointer;
   display: inline-block;
-  background: url(../../assets/images/close.svg);
+  background: url(../../images/close.svg);
 }
 
 .dialog-option__item {

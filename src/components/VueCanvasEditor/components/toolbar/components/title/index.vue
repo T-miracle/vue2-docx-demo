@@ -1,24 +1,16 @@
 <template>
-    <div class="menu-item__size">
-        <span class="select" title="字体" @click.stop="clickHandler">小四</span>
-        <div ref="options" class="options" @click.stop="switchFontSizeHandler">
+    <div class="menu-item__title" @click="clickHandler">
+        <i></i>
+        <span class="select" title="切换标题">正文</span>
+        <div ref="options" class="options" @click="switchTitleLevelHandler">
             <ul>
-                <li data-size="56">初号</li>
-                <li data-size="48">小初</li>
-                <li data-size="34">一号</li>
-                <li data-size="32">小一</li>
-                <li data-size="29">二号</li>
-                <li data-size="24">小二</li>
-                <li data-size="21">三号</li>
-                <li data-size="20">小三</li>
-                <li data-size="18">四号</li>
-                <li data-size="16">小四</li>
-                <li data-size="14">五号</li>
-                <li data-size="12">小五</li>
-                <li data-size="10">六号</li>
-                <li data-size="8">小六</li>
-                <li data-size="7">七号</li>
-                <li data-size="6">八号</li>
+                <li style="font-size:16px;">正文</li>
+                <li data-level="first" style="font-size:26px;">标题1</li>
+                <li data-level="second" style="font-size:24px;">标题2</li>
+                <li data-level="third" style="font-size:22px;">标题3</li>
+                <li data-level="fourth" style="font-size:20px;">标题4</li>
+                <li data-level="fifth" style="font-size:18px;">标题5</li>
+                <li data-level="sixth" style="font-size:16px;">标题6</li>
             </ul>
         </div>
     </div>
@@ -32,13 +24,10 @@
             clickHandler() {
                 this.$refs.options.classList.toggle('visible');
             },
-            switchFontSizeHandler(e) {
-                const fontSize = e.target.dataset.size;
-                if (fontSize) {
-                    const instance = this.editorInstance();
-                    instance.command.executeSize(parseInt(fontSize, 10));
-                    this.clickHandler();
-                }
+            switchTitleLevelHandler(e) {
+                const level = e.target.dataset.level;
+                const instance = this.editorInstance();
+                instance.command.executeTitle(level || null);
             }
         }
     };

@@ -1,22 +1,52 @@
 <template>
-    <div class="menu-item__italic" :title="title" @click.stop="clickHandler">
+    <div class="menu-item__underline" @click="clickHandler">
         <i></i>
+        <span class="select" :title="title"></span>
+        <div ref="options" class="options" @click="switchDecorationStyleHandler">
+            <ul>
+                <li data-decoration-style='solid'>
+                    <i></i>
+                </li>
+                <li data-decoration-style='double'>
+                    <i></i>
+                </li>
+                <li data-decoration-style='dashed'>
+                    <i></i>
+                </li>
+                <li data-decoration-style='dotted'>
+                    <i></i>
+                </li>
+                <li data-decoration-style='wavy'>
+                    <i></i>
+                </li>
+            </ul>
+        </div>
     </div>
 </template>
 
 <script>
     export default {
-        name: 'Italic',
+        name: 'Underline',
         inject: [ 'editorInstance', 'isApple' ],
         computed: {
             title() {
-                return `斜体(${ this.isApple() ? '⌘' : 'Ctrl' }+I)`;
+                return `下划线(${ this.isApple() ? '⌘' : 'Ctrl' }+U)`;
             }
         },
         methods: {
             clickHandler() {
-                const instance = this.editorInstance();
-                instance.command.executeItalic();
+                this.$refs.options.classList.toggle('visible');
+            },
+            switchDecorationStyleHandler(e) {
+                const decorationStyle = e.target.dataset.decorationStyle;
+                console.log(decorationStyle);
+                if (decorationStyle) {
+                    const instance = this.editorInstance();
+                    instance.command.executeUnderline({
+                        style: decorationStyle
+                    });
+                    this.clickHandler();
+                }
             }
         }
     };

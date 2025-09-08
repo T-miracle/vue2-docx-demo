@@ -1,5 +1,5 @@
 <template>
-    <div class="menu-item__left" :title="`左对齐(${isApple() ? '⌘' : 'Ctrl'}+L)`" @click="clickHandler">
+    <div class="menu-item__center" :title="`居中对齐(${isApple() ? '⌘' : 'Ctrl'}+E)`" @click="clickHandler">
         <i></i>
     </div>
 </template>
@@ -8,17 +8,12 @@
     import { RowFlex } from '@hufe921/canvas-editor';
 
     export default {
-        name: 'Left',
+        name: 'Center',
         inject: [ 'editorInstance', 'isApple' ],
-        computed: {
-            title() {
-                return `撤销(${ this.isApple() ? '⌘' : 'Ctrl' }+Z)`;
-            }
-        },
         methods: {
             clickHandler() {
                 const editor = this.editorInstance();
-                editor.command.executeRowFlex(RowFlex.LEFT);
+                editor.command.executeRowFlex(RowFlex.CENTER);
             }
         }
     };

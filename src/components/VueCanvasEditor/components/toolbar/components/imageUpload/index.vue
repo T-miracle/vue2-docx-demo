@@ -7,7 +7,7 @@
 
 <script>
     export default {
-        name: 'Image',
+        name: 'ImageUpload',
         inject: [ 'editorInstance', 'isApple' ],
         methods: {
             clickHandler() {
@@ -20,7 +20,7 @@
                 fileReader.onload = () => {
                     const image = new Image()
                     const value = fileReader.result
-                    image.src = value
+                    image.src = value.toString()
                     image.onload = () => {
                         this.editorInstance().command.executeImage({
                             value,

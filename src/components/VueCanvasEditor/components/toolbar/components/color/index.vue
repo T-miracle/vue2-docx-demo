@@ -1,10 +1,8 @@
 <template>
-    <div
-        class="menu-item__superscript"
-        :title="`上标(${isApple() ? '⌘' : 'Ctrl'}+Shift+,)`"
-        @click.stop="clickHandler"
-    >
+    <div class="menu-item__color" title="字体颜色" @click="clickHandler">
         <i></i>
+        <span></span>
+        <input ref="color" type="color" id="color" @input="setColorHandler"/>
     </div>
 </template>
 
@@ -14,10 +12,11 @@
         inject: [ 'editorInstance', 'isApple' ],
         methods: {
             clickHandler() {
-                const editor = this.editorInstance();
-                if (editor) {
-                    editor.command.executeSuperscript();
-                }
+                this.$refs.color.click();
+            },
+            setColorHandler(e) {
+                const instance = this.editorInstance();
+                instance.command.executeColor(e.target.value);
             }
         }
     };
