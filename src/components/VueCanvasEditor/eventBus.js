@@ -29,4 +29,6 @@ export const EVENTS = {
     UPDATE_COL_NO: 'update-col-no',
     // 禁用非排除工具栏按钮
     DISABLE_NON_EXCLUDE_TOOLBAR_BUTTONS: 'disable-non-exclude-toolbar-buttons',
+    // 范围样式变化
+    RANGE_STYLE_CHANGE: 'range-style-change',
 }

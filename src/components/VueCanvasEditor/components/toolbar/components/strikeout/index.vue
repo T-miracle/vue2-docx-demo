@@ -6,14 +6,11 @@
 
 <script>
     export default {
-        name: "Strikeout",
-        inject: [ 'editorInstance', 'isApple' ],
+        name: 'Strikeout',
+        inject: [ 'editorInstance' ],
         methods: {
             clickHandler() {
-                const editor = this.editorInstance();
-                if (editor) {
-                    editor.command.executeStrikeout()
-                }
+                this.editorInstance()?.command.executeStrikeout();
             }
         }
     };

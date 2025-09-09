@@ -26,7 +26,7 @@
         },
         data() {
             return {
-                // 画布编辑器实例
+                // 编辑器实例
                 editorInstance: null,
                 // 是否是苹果设备
                 isApple: false
@@ -62,46 +62,44 @@
                 this.editorInstance = instance;
 
                 // 监听内容变化，进行相应处理
-                instance.listener.contentChange = debounce(this.handleContentChange, 200)
+                instance.listener.contentChange = debounce(this.handleContentChange, 200);
                 // 初始化时触发一次内容变化处理
-                this.handleContentChange()
+                this.handleContentChange();
 
                 // 监听保存事件
                 instance.listener.saved = (payload) => {
-                    console.log('elementList: ', payload)
-                }
+                    console.log('elementList: ', payload);
+                };
 
                 // 初始化右键菜单
-                instance.register.contextMenuList(Object.values(contextMenu))
+                instance.register.contextMenuList(Object.values(contextMenu));
 
                 // 监听目录模式变化
-                instance.listener.pageModeChange = mode => {
+                instance.listener.pageModeChange = mode =>
                     eventBus.$emit(EVENTS.PAGE_MODE_CHANGE, mode);
-                }
 
                 // 监听可见页码变化
-                instance.listener.visiblePageNoListChange = payload => {
+                instance.listener.visiblePageNoListChange = payload =>
                     eventBus.$emit(EVENTS.VISIBLE_PAGE_NO_LIST_CHANGE, payload);
-                }
 
                 // 监听页数变化
-                instance.listener.pageSizeChange = payload => {
+                instance.listener.pageSizeChange = payload =>
                     eventBus.$emit(EVENTS.PAGE_SIZE_CHANGE, payload);
-                }
 
                 // 监听页码变化
-                instance.listener.intersectionPageNoChange = payload => {
+                instance.listener.intersectionPageNoChange = payload =>
                     eventBus.$emit(EVENTS.PAGE_NO_CHANGE, payload);
-                }
 
                 instance.listener.rangeStyleChange = (payload) => {
+                    eventBus.$emit(EVENTS.RANGE_STYLE_CHANGE, payload);
+
                     // 行列信息
-                    const rangeContext = instance.command.getRangeContext()
+                    const rangeContext = instance.command.getRangeContext();
                     if (rangeContext) {
                         eventBus.$emit(EVENTS.UPDATE_ROW_NO, rangeContext.startRowNo + 1);
                         eventBus.$emit(EVENTS.UPDATE_COL_NO, rangeContext.startColNo + 1);
                     }
-                }
+                };
             },
             /** 关闭所有选项面板 */
             closeAllOptionsHandler(evt) {
