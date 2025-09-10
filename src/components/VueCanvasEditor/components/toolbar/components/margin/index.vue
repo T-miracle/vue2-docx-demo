@@ -16,15 +16,29 @@
 </template>
 
 <script>
+    import ActiveMixins from '@/components/VueCanvasEditor/components/toolbar/mixins/activeMixins';
+
     export default {
         name: 'Margin',
-        inject: [ 'editorInstance', 'isApple' ],
+        mixins: [ ActiveMixins ],
+        inject: [ 'editorInstance' ],
         methods: {
             clickHandler() {
                 this.$refs.options.classList.toggle('visible');
             },
             changeRowMarginHandler(evt) {
-                this.editorInstance().command.executeRowMargin(Number(evt.target.dataset.rowmargin))
+                this.editorInstance().command.executeRowMargin(Number(evt.target.dataset.rowmargin));
+            },
+            updateActiveStatus(payload) {
+                const rowOptionDom = this.$refs.options;
+
+                rowOptionDom
+                    .querySelectorAll('li')
+                    .forEach(li => li.classList.remove('active'));
+                const curRowMarginDom = rowOptionDom.querySelector(
+                    `[data-rowmargin='${ payload.rowMargin }']`
+                );
+                curRowMarginDom.classList.add('active');
             }
         }
     };

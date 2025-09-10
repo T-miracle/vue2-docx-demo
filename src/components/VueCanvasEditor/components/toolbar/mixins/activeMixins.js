@@ -1,5 +1,8 @@
 import { eventBus, EVENTS } from '../../../eventBus';
 
+/**
+ * change toolbar button active status mixin
+ */
 export default {
     data() {
         return {

@@ -5,8 +5,11 @@
 </template>
 
 <script>
+    import ActiveMixins from '@/components/VueCanvasEditor/components/toolbar/mixins/activeMixins';
+
     export default {
         name: "Redo",
+        mixins: [ ActiveMixins ],
         inject: [ 'editorInstance', 'isApple' ],
         computed: {
             title() {
@@ -19,6 +22,13 @@
                 if (editor) {
                     editor.command.executeRedo()
                 }
+            },
+            updateActiveStatus(payload) {
+                const redoDom = this.$el;
+
+                payload.redo
+                    ? redoDom.classList.remove('no-allow')
+                    : redoDom.classList.add('no-allow')
             }
         }
     };

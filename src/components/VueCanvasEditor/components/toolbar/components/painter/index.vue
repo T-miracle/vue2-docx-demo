@@ -5,8 +5,11 @@
 </template>
 
 <script>
+    import ActiveMixins from '@/components/VueCanvasEditor/components/toolbar/mixins/activeMixins';
+
     export default {
         name: "Painter",
+        mixins: [ ActiveMixins ],
         inject: [ 'editorInstance', 'isApple' ],
         data() {
             return {
@@ -41,6 +44,13 @@
                 instance.command.executePainter({
                     isDblclick: true
                 })
+            },
+            updateActiveStatus(payload) {
+                const painterDom = this.$el;
+
+                payload.painter
+                    ? painterDom.classList.add('active')
+                    : painterDom.classList.remove('active')
             }
         }
     };

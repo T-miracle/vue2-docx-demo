@@ -5,12 +5,21 @@
 </template>
 
 <script>
+    import ActiveMixins from '@/components/VueCanvasEditor/components/toolbar/mixins/activeMixins';
+
     export default {
         name: 'Strikeout',
+        mixins: [ ActiveMixins ],
         inject: [ 'editorInstance' ],
         methods: {
             clickHandler() {
-                this.editorInstance()?.command.executeStrikeout();
+                this.editorInstance().command.executeStrikeout();
+            },
+            updateActiveStatus(payload) {
+                const strikeoutDom = this.$el;
+                payload.strikeout
+                    ? strikeoutDom.classList.add('active')
+                    : strikeoutDom.classList.remove('active');
             }
         }
     };

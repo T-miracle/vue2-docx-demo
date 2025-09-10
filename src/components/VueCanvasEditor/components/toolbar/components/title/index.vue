@@ -1,7 +1,7 @@
 <template>
     <div class="menu-item__title" @click="clickHandler">
         <i></i>
-        <span class="select" title="切换标题">正文</span>
+        <span ref="select" class="select" title="切换标题">正文</span>
         <div ref="options" class="options" @click="switchTitleLevelHandler">
             <ul>
                 <li style="font-size:16px;">正文</li>
@@ -17,8 +17,11 @@
 </template>
 
 <script>
+    import ActiveMixins from '@/components/VueCanvasEditor/components/toolbar/mixins/activeMixins';
+
     export default {
         name: 'Size',
+        mixins: [ ActiveMixins ],
         inject: [ 'editorInstance', 'isApple' ],
         methods: {
             clickHandler() {
@@ -28,6 +31,24 @@
                 const level = e.target.dataset.level;
                 const instance = this.editorInstance();
                 instance.command.executeTitle(level || null);
+            },
+            updateActiveStatus(payload) {
+                const titleOptionDom = this.$refs.options;
+                const titleSelectDom = this.$refs.select;
+
+                titleOptionDom
+                    .querySelectorAll('li')
+                    .forEach(li => li.classList.remove('active'));
+                if (payload.level) {
+                    const curTitleDom = titleOptionDom.querySelector(
+                        `[data-level='${ payload.level }']`
+                    );
+                    titleSelectDom.innerText = curTitleDom.innerText;
+                    curTitleDom.classList.add('active');
+                } else {
+                    titleSelectDom.innerText = '正文';
+                    titleOptionDom.querySelector('li:first-child').classList.add('active');
+                }
             }
         }
     };

@@ -6,14 +6,24 @@
 
 <script>
     import { RowFlex } from '@hufe921/canvas-editor';
+    import ActiveMixins from '@/components/VueCanvasEditor/components/toolbar/mixins/activeMixins';
 
     export default {
         name: 'Right',
+        mixins: [ ActiveMixins ],
         inject: [ 'editorInstance', 'isApple' ],
         methods: {
             clickHandler() {
                 const editor = this.editorInstance();
                 editor.command.executeRowFlex(RowFlex.RIGHT);
+            },
+            updateActiveStatus(payload) {
+                const dom = this.$el;
+                if (payload.rowFlex && payload.rowFlex === 'right') {
+                    dom.classList.add('active');
+                } else {
+                    dom.classList.remove('active');
+                }
             }
         }
     };

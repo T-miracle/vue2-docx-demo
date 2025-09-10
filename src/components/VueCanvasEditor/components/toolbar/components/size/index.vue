@@ -1,6 +1,6 @@
 <template>
     <div class="menu-item__size" @click="clickHandler">
-        <span class="select" title="字体">小四</span>
+        <span ref="select" class="select" title="字体">小四</span>
         <div ref="options" class="options" @click="switchFontSizeHandler">
             <ul>
                 <li data-size="56">初号</li>
@@ -25,9 +25,12 @@
 </template>
 
 <script>
+    import ActiveMixins from '../../mixins/activeMixins';
+
     export default {
         name: 'Size',
-        inject: [ 'editorInstance', 'isApple' ],
+        inject: [ 'editorInstance' ],
+        mixins: [ ActiveMixins ],
         methods: {
             clickHandler() {
                 this.$refs.options.classList.toggle('visible');
@@ -37,6 +40,23 @@
                 if (fontSize) {
                     const instance = this.editorInstance();
                     instance.command.executeSize(parseInt(fontSize, 10));
+                }
+            },
+            updateActiveStatus(payload) {
+                const sizeOptionDom = this.$refs.options;
+                const sizeSelectDom = this.$refs.select;
+
+                sizeOptionDom
+                    .querySelectorAll('li')
+                    .forEach(li => li.classList.remove('active'))
+                const curSizeDom = sizeOptionDom.querySelector(
+                    `[data-size='${payload.size}']`
+                )
+                if (curSizeDom) {
+                    sizeSelectDom.innerText = curSizeDom.innerText
+                    curSizeDom.classList.add('active')
+                } else {
+                    sizeSelectDom.innerText = `${payload.size}`
                 }
             }
         }

@@ -1,6 +1,6 @@
 <template>
     <div class="menu-item__font" @click="clickHandler">
-        <span class="select" :title="title">微软雅黑</span>
+        <span ref="select" class="select" title="字体">微软雅黑</span>
         <div ref="options" class="options" @click="switchFontFamilyHandler">
             <ul>
                 <li data-family="Microsoft YaHei" style="font-family:'Microsoft YaHei';">微软雅黑</li>
@@ -25,24 +25,37 @@
 </template>
 
 <script>
+    import ActiveMixins from '@/components/VueCanvasEditor/components/toolbar/mixins/activeMixins';
+
     export default {
         name: 'Font',
-        inject: [ 'editorInstance', 'isApple' ],
-        computed: {
-            title() {
-                return `字体`;
-            }
-        },
+        inject: [ 'editorInstance' ],
+        mixins: [ ActiveMixins ],
         methods: {
             clickHandler() {
                 this.$refs.options.classList.toggle('visible')
             },
             switchFontFamilyHandler(e) {
                 const fontFamily = e.target.dataset.family;
-                console.log(fontFamily);
                 if (fontFamily) {
                     const instance = this.editorInstance();
                     instance.command.executeFont(e.target.dataset.family);
+                }
+            },
+            updateActiveStatus(payload) {
+                const fontOptionDom = this.$refs.options;
+                const fontSelectDom = this.$refs.select;
+
+                fontOptionDom
+                    .querySelectorAll('li')
+                    .forEach(li => li.classList.remove('active'))
+                const curFontDom = fontOptionDom.querySelector(
+                    `[data-family='${payload.font}']`
+                )
+                if (curFontDom) {
+                    fontSelectDom.innerText = curFontDom.innerText
+                    fontSelectDom.style.fontFamily = payload.font
+                    curFontDom.classList.add('active')
                 }
             }
         }

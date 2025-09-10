@@ -23,12 +23,14 @@ export const EVENTS = {
     RELOAD_CATALOG: 'reload-catalog',
     // 更新字数
     UPDATE_WORD_COUNT: 'update-word-count',
-    // 更新行
-    UPDATE_ROW_NO: 'update-row-no',
-    // 更新列
-    UPDATE_COL_NO: 'update-col-no',
     // 禁用非排除工具栏按钮
     DISABLE_NON_EXCLUDE_TOOLBAR_BUTTONS: 'disable-non-exclude-toolbar-buttons',
-    // 范围样式变化
+    // 选区样式变化
     RANGE_STYLE_CHANGE: 'range-style-change',
+    // 控制器变化
+    CONTROL_CHANGE: 'control-change',
+    // 按文本搜索
+    SEARCH_BY_TEXT: 'search-by-text',
+    // 页面缩放变化
+    PAGE_SCALE_CHANGE: 'page-scale-change',
 }

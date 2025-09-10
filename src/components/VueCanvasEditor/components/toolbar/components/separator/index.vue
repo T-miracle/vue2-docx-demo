@@ -1,5 +1,9 @@
 <template>
-    <div class="menu-item__separator" @click="clickHandler">
+    <div
+        class="menu-item__separator"
+        :class="{ active }"
+        @click="clickHandler"
+    >
         <i title="分割线"></i>
         <div ref="options" class="options" @mousedown="selectSeparatorStyleHandler">
             <ul>
@@ -27,25 +31,43 @@
 </template>
 
 <script>
+    import ActiveMixins from '../../mixins/activeMixins';
+    import { ElementType } from '@hufe921/canvas-editor';
+
     export default {
         name: 'Separator',
-        inject: [ 'editorInstance', 'isApple' ],
+        inject: [ 'editorInstance' ],
+        mixins: [ ActiveMixins ],
         methods: {
             clickHandler() {
-                this.$refs.options.classList.toggle('visible')
+                this.$refs.options.classList.toggle('visible');
             },
             selectSeparatorStyleHandler(evt) {
-                console.log(evt.target);
-                let payload = []
-                const li = evt.target
-                const separatorDash = li.dataset.separator?.split(',').map(Number)
+                let payload = [];
+                const li = evt.target;
+                const separatorDash = li.dataset.separator?.split(',').map(Number);
                 if (separatorDash) {
-                    const isSingleLine = separatorDash.every(d => d === 0)
+                    const isSingleLine = separatorDash.every(d => d === 0);
                     if (!isSingleLine) {
-                        payload = separatorDash
+                        payload = separatorDash;
                     }
                 }
-                this.editorInstance().command.executeSeparator(payload)
+                this.editorInstance().command.executeSeparator(payload);
+            },
+            updateActiveStatus(payload) {
+                this.active = payload.type === ElementType.SEPARATOR;
+
+                const separatorOptionDom = this.$refs.options;
+                separatorOptionDom
+                    .querySelectorAll('li')
+                    .forEach(li => li.classList.remove('active'));
+                const separator = payload.dashArray.join(',') || '0,0';
+                const curSeparatorDom = separatorOptionDom.querySelector(
+                    `[data-separator='${ separator }']`
+                );
+                if (curSeparatorDom) {
+                    curSeparatorDom.classList.add('active');
+                }
             }
         }
     };

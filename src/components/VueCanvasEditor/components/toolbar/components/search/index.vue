@@ -34,9 +34,17 @@
 </template>
 
 <script>
+    import { eventBus, EVENTS } from '@/components/VueCanvasEditor/eventBus';
+
     export default {
         name: 'Search',
         inject: [ 'editorInstance', 'isApple' ],
+        created() {
+            eventBus.$on(EVENTS.SEARCH_BY_TEXT, this.searchByText);
+        },
+        beforeDestroy() {
+            eventBus.$off(EVENTS.SEARCH_BY_TEXT, this.searchByText);
+        },
         methods: {
             clickHandler() {
                 const searchDom = this.$refs.search;
@@ -54,6 +62,16 @@
                     searchCollapseDom.style.right = 'unset';
                 }
                 searchInputDom.focus();
+            },
+            searchByText(text) {
+                const instance = this.editorInstance();
+                const searchInputDom = this.$refs.searchInput;
+                this.clickHandler();
+                if (text) {
+                    searchInputDom.value = text
+                    instance.command.executeSearch(text)
+                    this.setSearchResult()
+                }
             },
             setSearchResult() {
                 const instance = this.editorInstance();

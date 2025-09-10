@@ -5,8 +5,11 @@
 </template>
 
 <script>
+    import ActiveMixins from '@/components/VueCanvasEditor/components/toolbar/mixins/activeMixins';
+
     export default {
         name: 'Italic',
+        mixins: [ ActiveMixins ],
         inject: [ 'editorInstance', 'isApple' ],
         computed: {
             title() {
@@ -17,6 +20,10 @@
             clickHandler() {
                 const instance = this.editorInstance();
                 instance.command.executeItalic();
+            },
+            updateActiveStatus(payload) {
+                const italicDom = this.$el;
+                payload.italic ? italicDom.classList.add('active') : italicDom.classList.remove('active');
             }
         }
     };

@@ -25,9 +25,12 @@
 </template>
 
 <script>
+    import ActiveMixins from '@/components/VueCanvasEditor/components/toolbar/mixins/activeMixins';
+
     export default {
         name: 'Underline',
         inject: [ 'editorInstance', 'isApple' ],
+        mixins: [ ActiveMixins ],
         computed: {
             title() {
                 return `下划线(${ this.isApple() ? '⌘' : 'Ctrl' }+U)`;
@@ -47,7 +50,14 @@
                     });
                     this.clickHandler();
                 }
-            }
+            },
+            updateActiveStatus(payload) {
+                const underlineDom = this.$el;
+
+                payload.underline
+                    ? underlineDom.classList.add('active')
+                    : underlineDom.classList.remove('active')
+            },
         }
     };
 </script>

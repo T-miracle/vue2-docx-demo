@@ -5,8 +5,11 @@
 </template>
 
 <script>
+    import ActiveMixins from '@/components/VueCanvasEditor/components/toolbar/mixins/activeMixins';
+
     export default {
         name: 'Undo',
+        mixins: [ ActiveMixins ],
         inject: [ 'editorInstance', 'isApple' ],
         computed: {
             title() {
@@ -19,6 +22,13 @@
                 if (editor) {
                     editor.command.executeUndo()
                 }
+            },
+            updateActiveStatus(payload) {
+                const undoDom = this.$el;
+
+                payload.undo
+                    ? undoDom.classList.remove('no-allow')
+                    : undoDom.classList.add('no-allow')
             }
         }
     };

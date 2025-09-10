@@ -16,6 +16,7 @@
     import { eventBus, EVENTS } from './eventBus';
     import { debounce } from './utils';
     import { contextMenu } from './contextMenu';
+    import shortcut from '@/components/VueCanvasEditor/shortcut';
 
     export default {
         name: 'VueCanvasEditor',
@@ -90,16 +91,17 @@
                 instance.listener.intersectionPageNoChange = payload =>
                     eventBus.$emit(EVENTS.PAGE_NO_CHANGE, payload);
 
-                instance.listener.rangeStyleChange = (payload) => {
+                // 监听选区样式变化
+                instance.listener.rangeStyleChange = payload =>
                     eventBus.$emit(EVENTS.RANGE_STYLE_CHANGE, payload);
 
-                    // 行列信息
-                    const rangeContext = instance.command.getRangeContext();
-                    if (rangeContext) {
-                        eventBus.$emit(EVENTS.UPDATE_ROW_NO, rangeContext.startRowNo + 1);
-                        eventBus.$emit(EVENTS.UPDATE_COL_NO, rangeContext.startColNo + 1);
-                    }
-                };
+                instance.listener.controlChange = payload =>
+                    eventBus.$emit(EVENTS.CONTROL_CHANGE, payload);
+
+                instance.listener.pageScaleChange = payload =>
+                    eventBus.$emit(EVENTS.PAGE_SCALE_CHANGE, payload);
+
+                instance.register.shortcutList(shortcut);
             },
             /** 关闭所有选项面板 */
             closeAllOptionsHandler(evt) {
@@ -111,7 +113,6 @@
             },
             /** 内容变化时触发 */
             async handleContentChange() {
-                console.log('内容变化了');
                 // 更新字数
                 eventBus.$emit(EVENTS.UPDATE_WORD_COUNT);
                 // 重载目录

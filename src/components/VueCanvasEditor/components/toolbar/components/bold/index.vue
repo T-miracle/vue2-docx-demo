@@ -5,9 +5,12 @@
 </template>
 
 <script>
+    import ActiveMixins from '@/components/VueCanvasEditor/components/toolbar/mixins/activeMixins';
+
     export default {
         name: 'Bold',
         inject: [ 'editorInstance', 'isApple' ],
+        mixins: [ ActiveMixins ],
         computed: {
             title() {
                 return `加粗(${ this.isApple() ? '⌘' : 'Ctrl' }+B)`;
@@ -17,6 +20,10 @@
             clickHandler() {
                 const instance = this.editorInstance();
                 instance.command.executeBold();
+            },
+            updateActiveStatus(payload) {
+                const boldDom = this.$el;
+                payload.bold ? boldDom.classList.add('active') : boldDom.classList.remove('active')
             }
         }
     };

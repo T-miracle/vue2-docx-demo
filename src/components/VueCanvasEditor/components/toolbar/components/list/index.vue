@@ -42,8 +42,12 @@
 </template>
 
 <script>
+    import ActiveMixins from '@/components/VueCanvasEditor/components/toolbar/mixins/activeMixins';
+    import { ListStyle, ListType } from '@hufe921/canvas-editor';
+
     export default {
         name: 'List',
+        mixins: [ ActiveMixins ],
         inject: [ 'editorInstance', 'isApple' ],
         methods: {
             clickHandler() {
@@ -54,6 +58,27 @@
                 const listType = li.dataset.listType || null;
                 const listStyle = li.dataset.listStyle;
                 this.editorInstance().command.executeList(listType, listStyle);
+            },
+            updateActiveStatus(payload) {
+                const listOptionDom = this.$refs.options;
+                const listDom = this.$el;
+
+                listOptionDom
+                    .querySelectorAll('li')
+                    .forEach(li => li.classList.remove('active'));
+                if (payload.listType) {
+                    listDom.classList.add('active');
+                    const listType = payload.listType;
+                    const listStyle = payload.listType === ListType.OL ? ListStyle.DECIMAL : payload.listStyle;
+                    const curListDom = listOptionDom.querySelector(
+                        `[data-list-type='${ listType }'][data-list-style='${ listStyle }']`
+                    );
+                    if (curListDom) {
+                        curListDom.classList.add('active');
+                    }
+                } else {
+                    listDom.classList.remove('active');
+                }
             }
         }
     };
