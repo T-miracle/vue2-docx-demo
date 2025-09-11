@@ -12,7 +12,7 @@
 
 <script>
     import { eventBus, EVENTS } from '../../eventBus';
-    import { nextTick } from '../../utils';
+    import { nextTick } from '../../utils/common';
 
     export default {
         name: 'Catalog',

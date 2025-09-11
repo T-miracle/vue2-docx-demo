@@ -5,7 +5,7 @@ import Vue from 'vue';
  * 给 VueCanvasEditor 及其子组件使用
  * 提供了一个中央事件管理机制，方便组件之间的消息传递和事件处理
  */
-export const eventBus = new Vue()
+export const eventBus = new Vue();
 
 // 定义常用事件名称，避免硬编码字符串
 export const EVENTS = {
@@ -27,10 +27,10 @@ export const EVENTS = {
     DISABLE_NON_EXCLUDE_TOOLBAR_BUTTONS: 'disable-non-exclude-toolbar-buttons',
     // 选区样式变化
     RANGE_STYLE_CHANGE: 'range-style-change',
-    // 控制器变化
+    // 控件变化
     CONTROL_CHANGE: 'control-change',
     // 按文本搜索
     SEARCH_BY_TEXT: 'search-by-text',
     // 页面缩放变化
-    PAGE_SCALE_CHANGE: 'page-scale-change',
-}
+    PAGE_SCALE_CHANGE: 'page-scale-change'
+};
