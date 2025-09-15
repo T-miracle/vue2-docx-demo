@@ -3,7 +3,9 @@
         <span ref="select" class="select" title="字体">微软雅黑</span>
         <div ref="options" class="options" @click="switchFontFamilyHandler">
             <ul>
-                <li data-family="Microsoft YaHei" style="font-family:'Microsoft YaHei';">微软雅黑</li>
+                <li data-family="宋体" style="font-family:'宋体';">宋体</li>
+                <li data-family="微软雅黑" style="font-family:'微软雅黑';">微软雅黑</li>
+                <!--<li data-family="Microsoft YaHei" style="font-family:'Microsoft YaHei';">微软雅黑</li>
                 <li data-family="华文宋体" style="font-family:'华文宋体';">华文宋体</li>
                 <li data-family="华文黑体" style="font-family:'华文黑体';">华文黑体</li>
                 <li data-family="华文仿宋" style="font-family:'华文仿宋';">华文仿宋</li>
@@ -18,7 +20,7 @@
                 <li data-family="Arial" style="font-family:'Arial';">Arial</li>
                 <li data-family="Segoe UI" style="font-family:'Segoe UI';">Segoe UI</li>
                 <li data-family="Ink Free" style="font-family:'Ink Free';">Ink Free</li>
-                <li data-family="Fantasy" style="font-family:'Fantasy';">Fantasy</li>
+                <li data-family="Fantasy" style="font-family:'Fantasy';">Fantasy</li>-->
             </ul>
         </div>
     </div>

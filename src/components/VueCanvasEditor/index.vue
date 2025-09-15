@@ -1,19 +1,21 @@
 <template>
     <div class="canvas-editor__container">
-        <div ref="test"></div>
         <Toolbar></Toolbar>
         <Catalog></Catalog>
         <div ref="editor" class="editor"></div>
         <Footer></Footer>
-        <div style="position: absolute; width: auto; height: auto; top: 400px; right: 20px">
+        <div style="position: absolute; width: auto; height: auto; top: 400px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 1000; align-items: center;">
             <button @click="importFile({ instance: editorInstance })">导入</button>
             <button @click="exportFile({ instance: editorInstance })">导出</button>
+            <button @click="convertToHTML">转换成HTML</button>
+            <button @click="convertToDocx">转换成docx</button>
+            <input ref="fileRef" type="file" accept=".docx" style="display: none;">
         </div>
     </div>
 </template>
 
 <script>
-    import Editor, { createDomFromElementList } from '@hufe921/canvas-editor';
+    import Editor from '@hufe921/canvas-editor';
     import Toolbar from './components/toolbar/index.vue';
     import Footer from './components/footer/index.vue';
     import Catalog from './components/catalog/index.vue';
@@ -25,6 +27,10 @@
     import { importFile } from '@/components/VueCanvasEditor/utils/importFile';
     import { exportFile } from '@/components/VueCanvasEditor/utils/exportFile';
     import { debounce } from './utils/common';
+    import demoData from '@/components/VueCanvasEditor/demoData';
+    import { toDocx, toHtml } from 'docshift';
+    import { toHtml as myToHtml } from '@/components/VueCanvasEditor/utils/docx/importDocx';
+    import { convertImgBlobsInHtml } from '@/components/VueCanvasEditor/utils/htmlImageBlobConvertToBase64';
 
     export default {
         name: 'VueCanvasEditor',
@@ -41,331 +47,6 @@
                 isApple: false
             };
         },
-        created() {
-            const dom = createDomFromElementList([
-                {
-                    'value': '啊是大家的计划',
-                    'size': 16,
-                    'bold': false,
-                    'color': 'rgb(0, 0, 0)',
-                    'italic': false
-                },
-                {
-                    'value': '\n\n\n'
-                },
-                {
-                    'value': '阿斯顿哈工大计划',
-                    'size': 16,
-                    'bold': false,
-                    'color': 'rgb(0, 0, 0)',
-                    'italic': false
-                },
-                {
-                    'value': '\n\n'
-                },
-                {
-                    'value': '\n',
-                    'rowFlex': 'center'
-                },
-                {
-                    'value': '阿桑的歌哈工大换个环境',
-                    'size': 16,
-                    'bold': false,
-                    'color': 'rgb(0, 0, 0)',
-                    'italic': false,
-                    'rowFlex': 'center'
-                },
-                {
-                    'value': '\n\n'
-                },
-                {
-                    'value': '撒旦把大家',
-                    'size': 16,
-                    'bold': false,
-                    'color': 'rgb(0, 0, 0)',
-                    'italic': false
-                },
-                {
-                    'value': '\n\n'
-                },
-                {
-                    'value': '\n',
-                    'type': 'separator',
-                    'dashArray': [],
-                    'width': 554
-                },
-                {
-                    'value': '\n\n'
-                },
-                {
-                    'value': '俺是个大概好久打工会刚好经过',
-                    'size': 16,
-                    'bold': false,
-                    'color': 'rgb(0, 0, 0)',
-                    'italic': false
-                },
-                {
-                    'value': '\n'
-                },
-                {
-                    'value': 'data:image/png;base64,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',
-                    'type': 'image',
-                    'width': 38,
-                    'height': 42
-                },
-                {
-                    'value': '\n'
-                },
-                {
-                    'value': '\n',
-                    'type': 'table',
-                    'trList': [
-                        {
-                            'height': 42,
-                            'minHeight': 42,
-                            'tdList': [
-                                {
-                                    'colspan': 1,
-                                    'rowspan': 1,
-                                    'value': [
-                                        {
-                                            'value': '1',
-                                            'size': 16,
-                                            'bold': false,
-                                            'color': 'rgb(0, 0, 0)',
-                                            'italic': false
-                                        }
-                                    ],
-                                    'verticalAlign': 'middle'
-                                },
-                                {
-                                    'colspan': 1,
-                                    'rowspan': 1,
-                                    'value': [],
-                                    'verticalAlign': 'middle'
-                                },
-                                {
-                                    'colspan': 1,
-                                    'rowspan': 1,
-                                    'value': [],
-                                    'verticalAlign': 'middle'
-                                },
-                                {
-                                    'colspan': 1,
-                                    'rowspan': 1,
-                                    'value': [],
-                                    'verticalAlign': 'middle'
-                                },
-                                {
-                                    'colspan': 1,
-                                    'rowspan': 1,
-                                    'value': [],
-                                    'verticalAlign': 'middle'
-                                },
-                                {
-                                    'colspan': 1,
-                                    'rowspan': 1,
-                                    'value': [],
-                                    'verticalAlign': 'middle'
-                                }
-                            ]
-                        },
-                        {
-                            'height': 42,
-                            'minHeight': 42,
-                            'tdList': [
-                                {
-                                    'colspan': 1,
-                                    'rowspan': 1,
-                                    'value': [],
-                                    'verticalAlign': 'middle'
-                                },
-                                {
-                                    'colspan': 1,
-                                    'rowspan': 1,
-                                    'value': [
-                                        {
-                                            'value': '2',
-                                            'size': 16,
-                                            'bold': false,
-                                            'color': 'rgb(0, 0, 0)',
-                                            'italic': false
-                                        }
-                                    ],
-                                    'verticalAlign': 'middle'
-                                },
-                                {
-                                    'colspan': 1,
-                                    'rowspan': 1,
-                                    'value': [],
-                                    'verticalAlign': 'middle'
-                                },
-                                {
-                                    'colspan': 2,
-                                    'rowspan': 1,
-                                    'value': [
-                                        {
-                                            'value': '1313112313131',
-                                            'size': 16,
-                                            'bold': false,
-                                            'color': 'rgb(0, 0, 0)',
-                                            'italic': false
-                                        }
-                                    ],
-                                    'verticalAlign': 'middle'
-                                },
-                                {
-                                    'colspan': 1,
-                                    'rowspan': 1,
-                                    'value': [],
-                                    'verticalAlign': 'middle'
-                                }
-                            ]
-                        },
-                        {
-                            'height': 42,
-                            'minHeight': 42,
-                            'tdList': [
-                                {
-                                    'colspan': 1,
-                                    'rowspan': 1,
-                                    'value': [],
-                                    'verticalAlign': 'middle'
-                                },
-                                {
-                                    'colspan': 1,
-                                    'rowspan': 1,
-                                    'value': [],
-                                    'verticalAlign': 'middle'
-                                },
-                                {
-                                    'colspan': 1,
-                                    'rowspan': 1,
-                                    'value': [
-                                        {
-                                            'value': '3',
-                                            'size': 16,
-                                            'bold': false,
-                                            'color': 'rgb(0, 0, 0)',
-                                            'italic': false
-                                        }
-                                    ],
-                                    'verticalAlign': 'middle'
-                                },
-                                {
-                                    'colspan': 1,
-                                    'rowspan': 1,
-                                    'value': [],
-                                    'verticalAlign': 'middle'
-                                },
-                                {
-                                    'colspan': 1,
-                                    'rowspan': 1,
-                                    'value': [],
-                                    'verticalAlign': 'middle'
-                                },
-                                {
-                                    'colspan': 1,
-                                    'rowspan': 1,
-                                    'value': [],
-                                    'verticalAlign': 'middle'
-                                }
-                            ]
-                        },
-                        {
-                            'height': 42,
-                            'minHeight': 42,
-                            'tdList': [
-                                {
-                                    'colspan': 1,
-                                    'rowspan': 1,
-                                    'value': [],
-                                    'verticalAlign': 'middle'
-                                },
-                                {
-                                    'colspan': 1,
-                                    'rowspan': 1,
-                                    'value': [],
-                                    'verticalAlign': 'middle'
-                                },
-                                {
-                                    'colspan': 1,
-                                    'rowspan': 1,
-                                    'value': [],
-                                    'verticalAlign': 'middle'
-                                },
-                                {
-                                    'colspan': 1,
-                                    'rowspan': 1,
-                                    'value': [
-                                        {
-                                            'value': '4',
-                                            'size': 16,
-                                            'bold': false,
-                                            'color': 'rgb(0, 0, 0)',
-                                            'italic': false
-                                        }
-                                    ],
-                                    'verticalAlign': 'middle'
-                                },
-                                {
-                                    'colspan': 1,
-                                    'rowspan': 1,
-                                    'value': [],
-                                    'verticalAlign': 'middle'
-                                },
-                                {
-                                    'colspan': 1,
-                                    'rowspan': 1,
-                                    'value': [],
-                                    'verticalAlign': 'middle'
-                                }
-                            ]
-                        }
-                    ],
-                    'width': 558,
-                    'height': 168,
-                    'colgroup': [
-                        {
-                            'width': 93
-                        },
-                        {
-                            'width': 93
-                        },
-                        {
-                            'width': 93
-                        },
-                        {
-                            'width': 93
-                        },
-                        {
-                            'width': 93
-                        },
-                        {
-                            'width': 93
-                        }
-                    ]
-                },
-                {
-                    'value': '\n\n'
-                },
-                {
-                    'value': '',
-                    'type': 'hyperlink',
-                    'url': '213131',
-                    'valueList': [
-                        {
-                            'value': '1313',
-                            'color': '#0000FF',
-                            'underline': true
-                        }
-                    ]
-                }
-            ]);
-            this.$nextTick(() => {
-                this.$refs.test.append(dom)
-            })
-        },
         provide() {
             return {
                 editorInstance: () => this.editorInstance,
@@ -379,6 +60,9 @@
             window?.addEventListener('click', this.closeAllOptionsHandler, {
                 capture: true
             });
+
+            // 测试数据
+            this.setHTMLContent(demoData);
         },
         beforeDestroy() {
             window?.removeEventListener('click', this.closeAllOptionsHandler, {
@@ -455,6 +139,52 @@
                 /* nextTick(() => {
                     updateComment()
                 }) */
+            },
+            /**
+             * 设置HTML内容
+             * @param {Partial<IEditorHTML>} payload
+             */
+            setHTMLContent(payload) {
+                if (!this.editorInstance) {
+                    return;
+                }
+                this.editorInstance.command.executeSetHTML(payload);
+            },
+            convertToHTML() {
+                this.$refs.fileRef.click();
+                this.$refs.fileRef.onchange = async(e) => {
+                    const file = e.target.files[0];
+                    if (!file) {
+                        return;
+                    }
+                    console.log('file: ', file);
+                    let html = await toHtml(file);
+                    html = html.replaceAll('text-align:distribute', 'text-align:justify')
+                    html = await convertImgBlobsInHtml(html);
+                    console.log('html: ', html);
+
+                    let myHtml = await myToHtml(file)
+                    console.log('my html: ', myHtml);
+
+                    this.setHTMLContent({
+                        main: html
+                    });
+                };
+            },
+            async convertToDocx() {
+                const htmlAll = await this.editorInstance.command.getHTML();
+                console.log('htmlAll: ', htmlAll);
+                let html = htmlAll.main
+                // html = html.replaceAll('<br>','<br/>')
+                // html = html.replaceAll('text-align: justify', 'text-align:distribute')
+                console.log('html: ', html);
+                // const docxBlob = await toDocx(html);
+                // const url = URL.createObjectURL(docxBlob);
+                // const a = document.createElement('a');
+                // a.href = url;
+                // a.download = 'document.docx';
+                // a.click();
+                // URL.revokeObjectURL(url);
             }
         }
     };

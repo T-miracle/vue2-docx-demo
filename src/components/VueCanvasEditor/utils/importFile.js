@@ -12,17 +12,7 @@ export function importFile({ instance }) {
         if (!file) {
             return;
         }
-        const reader = new FileReader()
-        reader.onload = event => {
-            const buffer = event?.target?.result
-            if (buffer instanceof ArrayBuffer) {
-                command.executeImportDocx({
-                    arrayBuffer: buffer
-                })
-            }
-            event.target.value = ''
-        }
-        reader.readAsArrayBuffer(file)
+        command.executeImportDocx(file);
     });
 
     input.click();

@@ -1,40 +1,49 @@
-import mammoth from 'mammoth'
+import mammoth from 'mammoth/mammoth.browser';
 
-export default function (command) {
-    return async function (options) {
-        const { arrayBuffer } = options
-        const result = await mammoth.convertToHtml({
-            arrayBuffer
-        })
+const monospaceFonts = [ 'consolas', 'courier', 'courier new' ];
 
-        let html = result.value
+let options = {
+    transformDocument: mammoth.transforms.paragraph(transformParagraph),
+    preserveColors: true,
+    preserveFonts: true,
+    styleMap: [
+        'p[style-name=\'Title\'] => h1:fresh',
+        'p[style-name=\'Heading 1\'] => h1:fresh',
+        'p[style-name=\'Heading 2\'] => h2:fresh',
+        'p[style-name=\'Heading 3\'] => h3:fresh',
+        'p[style-name=\'Heading 4\'] => h4:fresh',
+        'p[style-name=\'Heading 5\'] => h5:fresh',
+        'p[style-name=\'Heading 6\'] => h6:fresh'
+    ]
+};
 
-        console.log('html', html);
-
-        // 创建 DOM 片段解析图片
-        const container = document.createElement('div')
-        container.innerHTML = html
-
-        const imgNodes = container.querySelectorAll('img')
-
-        await Promise.all(
-            Array.from(imgNodes).map(img => {
-                return new Promise(resolve => {
-                    const tmp = new Image()
-                    tmp.onload = () => {
-                        console.log('img loaded', img.src, tmp.width, tmp.height);
-                        img.width = tmp.width
-                        img.height = tmp.height
-                        resolve()
-                    }
-                    tmp.onerror = () => resolve()
-                    tmp.src = img.src
-                })
-            })
-        )
-
-        command.executeSetHTML({
-            main: container.innerHTML
-        })
+function transformParagraph(paragraph) {
+    const runs = mammoth.transforms.getDescendantsOfType(paragraph, 'run');
+    const isMatch = runs.length > 0 && runs.every(function(run) {
+        return run.font && monospaceFonts.indexOf(run.font.toLowerCase()) !== -1;
+    });
+    if (isMatch) {
+        return {
+            ...paragraph,
+            styleId: 'code',
+            styleName: 'Code'
+        };
+    } else {
+        return paragraph;
     }
+}
+
+export async function toHtml(blob) {
+    try {
+        let arrayBuffer = await blob.arrayBuffer();
+        let result = await mammoth.convertToHtml({arrayBuffer}, options);
+        return result.value;
+    } catch (error) {
+        console.log(error);
+        return '';
+    }
+};
+
+export default function(command) {
+    return {};
 }

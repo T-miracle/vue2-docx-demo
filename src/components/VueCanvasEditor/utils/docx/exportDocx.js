@@ -111,7 +111,6 @@ function convertElementToParagraphChild(element) {
 }
 
 function convertElementListToDocxChildren(elementList, options) {
-    console.log('elementList -->', elementList, options);
     // 存储转换后的所有 docx 节点
     const children = [];
     // 临时缓存当前段落里的子元素
@@ -133,6 +132,7 @@ function convertElementListToDocxChildren(elementList, options) {
     // 添加段落时传递，并且元素具有 rowFlex
     let targetElement = undefined;
     for (let e = 0; e < elementList.length; e++) {
+        console.log(('elementList[' + e + '] -->'), elementList[e]);
         const element = elementList[e];
         if (element.type === ElementType.TITLE) {
             appendParagraph();
@@ -264,7 +264,6 @@ function convertElementListToDocxChildren(elementList, options) {
         } else if (element.type === ElementType.DATE) {
             paragraphChild.push(...(element.valueList?.map(child => convertElementToParagraphChild(child)) || []));
         } else {
-
             if (/\n/.test(element.value)) {
                 const parts = element.value.split('\n');
                 parts.forEach((part, idx) => {

@@ -1,5 +1,9 @@
 /* 默认编辑器配置选项 */
 export const defaultEditorOptions =  {
+    // 默认字体
+    defaultFont: '宋体',
+    // 默认字号
+    defaultFontSize: 14,
     // 纸张边距
     margins: [100, 120, 100, 120],
     // 水印

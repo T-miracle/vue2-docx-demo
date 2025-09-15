@@ -12,6 +12,7 @@
     "@hufe921/canvas-editor-plugin-docx": "0.0.5",
     "color": "^4.2.3",
     "core-js": "^3.6.5",
+    "docshift": "0.0.73",
     "docx": "^8.2.2",
     "mammoth": "^1.10.0",
     "prismjs": "^1.30.0",
