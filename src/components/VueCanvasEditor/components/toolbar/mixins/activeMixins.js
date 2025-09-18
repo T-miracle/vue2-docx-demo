@@ -1,4 +1,4 @@
-import { eventBus, EVENTS } from '../../../eventBus';
+import { eventBus, EVENTS } from '../../../config/eventBus';
 
 /**
  * change toolbar button active status mixin

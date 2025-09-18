@@ -1,315 +1,38 @@
-import Color from 'color';
-import {
-    ElementType,
-    TitleLevel,
-    TableBorder,
-    TdBorder,
-    VerticalAlign as VerticalAlignEditor,
-    RowFlex,
-    ListType
-} from '@hufe921/canvas-editor';
 import {
     Document,
     Packer,
-    Paragraph,
-    Header,
-    Footer,
-    Table,
-    HeadingLevel,
-    TextRun,
-    Tab,
-    ExternalHyperlink,
-    ImageRun,
-    WidthType,
-    TableRow,
-    TableCell,
-    MathRun,
-    BorderStyle,
     AlignmentType,
-    VerticalAlign,
-    ShadingType,
-    PageBreak,
     LevelFormat,
-    CheckBox
 } from 'docx';
 import { convertPxToSize, saveAs } from './utils';
-
-const titleLevelToHeadingLevel = {
-    [TitleLevel.FIRST]: HeadingLevel.HEADING_1,
-    [TitleLevel.SECOND]: HeadingLevel.HEADING_2,
-    [TitleLevel.THIRD]: HeadingLevel.HEADING_3,
-    [TitleLevel.FOURTH]: HeadingLevel.HEADING_4,
-    [TitleLevel.FIFTH]: HeadingLevel.HEADING_5,
-    [TitleLevel.SIXTH]: HeadingLevel.HEADING_6
-};
-const rowFlexToAlignmentType = {
-    [RowFlex.LEFT]: AlignmentType.START,
-    [RowFlex.CENTER]: AlignmentType.CENTER,
-    [RowFlex.RIGHT]: AlignmentType.END,
-    [RowFlex.ALIGNMENT]: AlignmentType.JUSTIFIED,
-    [RowFlex.JUSTIFY]: AlignmentType.JUSTIFIED
-};
-const verticalAlignEditorToVerticalAlignDocx = {
-    [VerticalAlignEditor.TOP]: VerticalAlign.TOP,
-    [VerticalAlignEditor.MIDDLE]: VerticalAlign.CENTER,
-    [VerticalAlignEditor.BOTTOM]: VerticalAlign.BOTTOM
-};
-
-// 将元素转换为段落子元素
-function convertElementToParagraphChild(element) {
-    console.log('element -->', element);
-    if (element.type === ElementType.IMAGE) {
-        return new ImageRun({
-            data: element.value,
-            transformation: {
-                width: element.width,
-                height: element.height
-            }
-        });
-    }
-    if (element.type === ElementType.HYPERLINK) {
-        return new ExternalHyperlink({
-            children: [
-                new TextRun({
-                    text: element.valueList?.map(child => child.value).join(''),
-                    style: 'Hyperlink'
-                })
-            ],
-            link: element.url
-        });
-    }
-    if (element.type === ElementType.TAB) {
-        return new TextRun({
-            children: [new Tab()]
-        });
-    }
-    if (element.type === ElementType.LATEX) {
-        return new MathRun(element.value);
-    }
-    if (element.type === ElementType.PAGE_BREAK) {
-        return new PageBreak();
-    }
-    if (element.type === ElementType.CHECKBOX) {
-        return new CheckBox({
-            checked: true
-        });
-    }
-
-    return new TextRun({
-        font: element.font,
-        text: element.value.toString(),
-        bold: element.bold,
-        size: `${(element.size || 16) / 0.75}pt`,
-        color: Color(element.color).hex() || '#000000',
-        italics: element.italic,
-        strike: element.strikeout,
-        highlight: element.highlight ? Color(element.highlight).hex() : undefined,
-        superScript: element.type === ElementType.SUPERSCRIPT,
-        subScript: element.type === ElementType.SUBSCRIPT,
-        underline: element.underline ? {} : undefined
-    });
-}
-
-function convertElementListToDocxChildren(elementList, options) {
-    // 存储转换后的所有 docx 节点
-    const children = [];
-    // 临时缓存当前段落里的子元素
-    let paragraphChild = [];
-
-    // 每次添加段落时调用
-    function appendParagraph(element) {
-        if (paragraphChild.length) {
-            const alignment = (element && element.rowFlex) ? rowFlexToAlignmentType[element.rowFlex] : 'start';
-            console.log('alignment -->', alignment);
-            children.push(new Paragraph({
-                children: paragraphChild,
-                alignment
-            }));
-            paragraphChild = [];
-        }
-    }
-
-    // 添加段落时传递，并且元素具有 rowFlex
-    let targetElement = undefined;
-    for (let e = 0; e < elementList.length; e++) {
-        console.log(('elementList[' + e + '] -->'), elementList[e]);
-        const element = elementList[e];
-        if (element.type === ElementType.TITLE) {
-            appendParagraph();
-            children.push(new Paragraph({
-                heading: titleLevelToHeadingLevel[element.level],
-                children: element.valueList?.map(child => convertElementToParagraphChild(child)) || []
-            }));
-        } else if (element.type === ElementType.LIST) {
-            appendParagraph(element);
-            // ????
-            const listChildren = element.valueList
-                ?.map(item => item.value)
-                .join('')
-                .split('\n')
-                .map((text) => new Paragraph({
-                    children: [
-                        new TextRun({
-                            text: text
-                        })
-                    ],
-                    numbering: {
-                        reference: (!element.listType || element.listType !== ListType.OL)
-                            ? `bullet-points-1`
-                            : `numbering-1`,
-                        level: 0
-                    }
-                })) || [];
-            children.push(...listChildren);
-        } else if (element.type === ElementType.TABLE) {
-            appendParagraph(element);
-            const { borderType, colgroup, trList } = element;
-            const borderDashed = {
-                style: BorderStyle.DASHED,
-                size: 1,
-                color: '000000'
-            };
-            const borderEmpty = {
-                style: BorderStyle.NONE,
-                size: 0,
-                color: '#ffffff'
-            };
-            const bordersAll = {
-                top: borderDashed,
-                bottom: borderDashed,
-                left: borderDashed,
-                right: borderDashed
-            };
-            const bordersEmpty = {
-                top: borderEmpty,
-                bottom: borderEmpty,
-                left: borderEmpty,
-                right: borderEmpty
-            };
-            const tableRowList = [];
-            for (let r = 0; r < trList.length; r++) {
-                const tdList = trList[r].tdList;
-                const tableCellList = [];
-                for (let c = 0; c < tdList.length; c++) {
-                    const td = tdList[c];
-                    let borders = undefined;
-                    if (borderType === TableBorder.ALL) {
-                        borders = JSON.parse(JSON.stringify(bordersAll));
-                    }
-                    if (borderType === TableBorder.EMPTY) {
-                        borders = JSON.parse(JSON.stringify(bordersEmpty));
-                    }
-                    if (borderType === TableBorder.EXTERNAL) {
-                        borders = JSON.parse(JSON.stringify(bordersEmpty));
-                        const lastTdIndex = tdList.length - 1;
-                        const isTdLast = c === lastTdIndex;
-                        const containColSpan = td.colspan > 1;
-                        const colSpan = c + td.colspan;
-                        const rowSpan = r + td.rowspan;
-                        if (r === 0) {
-                            borders.top = borderDashed;
-                        }
-                        if (isTdLast || (containColSpan && colSpan === lastTdIndex)) {
-                            borders.right = borderDashed;
-                        }
-                        if ((r === trList.length - 1) || (rowSpan === trList.length - 1)) {
-                            borders.bottom = borderDashed;
-                        }
-                        if (c === 0) {
-                            borders.left = borderDashed;
-                        }
-                    }
-                    if (td.borderTypes && Object.values(td.borderTypes).includes(TdBorder.BOTTOM)) {
-                        borders.bottom = borderDashed;
-                    }
-                    const verticalAlign = td.verticalAlign
-                        ? verticalAlignEditorToVerticalAlignDocx[td.verticalAlign]
-                        : undefined;
-                    let shading = undefined;
-                    if (td.backgroundColor) {
-                        shading = {
-                            fill: td.backgroundColor,
-                            type: ShadingType.CLEAR,
-                            color: 'auto'
-                        };
-                    }
-                    const tdCell = {
-                        verticalAlign: verticalAlign,
-                        borders,
-                        shading,
-                        columnSpan: td.colspan,
-                        rowSpan: td.rowspan,
-                        children: convertElementListToDocxChildren(td.value, options) || []
-                    };
-                    tableCellList.push(new TableCell(tdCell));
-                }
-                tableRowList.push(new TableRow({
-                    children: tableCellList
-                }));
-            }
-            const columnWidths = colgroup?.reduce((acumm, colWidth) => {
-                const inches = convertPxToSize(colWidth.width);
-                acumm.push(inches);
-                return acumm;
-            }, []);
-            children.push(new Table({
-                rows: tableRowList,
-                alignment: AlignmentType.CENTER,
-                columnWidths: columnWidths,
-                width: {
-                    size: '100%',
-                    type: WidthType.PERCENTAGE
-                }
-            }));
-        } else if (element.type === ElementType.DATE) {
-            paragraphChild.push(...(element.valueList?.map(child => convertElementToParagraphChild(child)) || []));
-        } else {
-            if (/\n/.test(element.value)) {
-                const parts = element.value.split('\n');
-                parts.forEach((part, idx) => {
-                    if (part) {
-                        paragraphChild.push(convertElementToParagraphChild({
-                            ...element,
-                            value: part
-                        }));
-                    }
-                    // 在每段文字之间插入换行（最后一段不加）
-                    if (idx < parts.length - 1) {
-                        paragraphChild.push(new TextRun({ break: 1 }));
-                    }
-                });
-                // 换行后结束当前段落，保证段落排版生效
-                appendParagraph(element);
-            } else {
-                paragraphChild.push(convertElementToParagraphChild(element));
-            }
-            targetElement = element;
-        }
-    }
-    appendParagraph(targetElement);
-    return children;
-}
+import { toDocx } from './converter';
+import xmlJs from 'xml-js';
 
 export default function (command) {
     return async function (options) {
         const { fileName } = options;
         const { data: { header, main, footer } } = command.getValue();
-        console.log('command.getValue()', command.getValue());
+        // console.log('command.getValue()', command.getValue());
+        // console.log('----------HTML----------');
+        console.log(htmlToXmlJson(command.getHTML().main));
+        console.log('----------主界面内容----------');
+        console.log(main);
+        console.log('------------------------\n\n');
         const [top, right, bottom, left] = command.getOptions().margins;
         const doc = new Document({
             sections: [
                 {
-                    headers: {
+                    /* headers: {
                         default: new Header({
-                            children: convertElementListToDocxChildren(header || [], command.getOptions())
+                            children: toDocx(header || [], command.getOptions())
                         })
                     },
                     footers: {
                         default: new Footer({
-                            children: convertElementListToDocxChildren(footer || [], command.getOptions())
+                            children: toDocx(footer || [], command.getOptions())
                         })
-                    },
-                    children: convertElementListToDocxChildren(main || [], command.getOptions()),
+                    }, */
+                    children: toDocx(main || [], command.getOptions()),
                     properties: {
                         page: {
                             margin: {
@@ -352,4 +75,57 @@ export default function (command) {
             saveAs(blob, `${ fileName }.docx`);
         });
     };
+}
+
+function htmlToXmlJson(html) {
+    // 包裹根节点
+    let fixed = `<root>${html}</root>`;
+
+    console.log("原始 HTML:", fixed.toString());
+
+    // 转换常见 HTML 空标签为自闭合（这里只处理一些常见的，必要时可补充）
+    fixed = htmlToStrictXml(fixed)
+
+    console.log("转换后的 XML:", fixed.toString());
+
+    // 使用 xml-js 转换
+    try {
+        return xmlJs.xml2js(fixed, { compact: false, spaces: 2 });
+    } catch (err) {
+        console.error("解析失败:", err.message);
+        return null;
+    }
+}
+
+function htmlToStrictXml(html) {
+    // 使用 DOMParser 解析 HTML
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+
+    // 递归处理节点，将所有标签改为显式闭合
+    function nodeToXml(node) {
+        if (node.nodeType === Node.TEXT_NODE) {
+            return node.nodeValue
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;");
+        }
+        if (node.nodeType !== Node.ELEMENT_NODE) return '';
+
+        const tagName = node.tagName.toLowerCase();
+        const attrs = Array.from(node.attributes)
+            .map(attr => `${attr.name}="${attr.value}"`)
+            .join(' ');
+
+        const openTag = attrs ? `<${tagName} ${attrs}>` : `<${tagName}>`;
+
+        // 递归处理子节点
+        const childrenXml = Array.from(node.childNodes).map(nodeToXml).join('');
+
+        // 如果没有子节点，也强制闭合
+        return `${openTag}${childrenXml}</${tagName}>`;
+    }
+
+    // 处理 body 内的内容
+    return Array.from(doc.body.childNodes).map(nodeToXml).join('');
 }

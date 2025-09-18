@@ -34,7 +34,7 @@
 </template>
 
 <script>
-    import { eventBus, EVENTS } from '@/components/VueCanvasEditor/eventBus';
+    import { eventBus, EVENTS } from '@/components/VueCanvasEditor/config/eventBus';
 
     export default {
         name: 'Search',

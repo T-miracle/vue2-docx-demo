@@ -6,7 +6,7 @@
 
 <script>
     import { EditorMode } from '@hufe921/canvas-editor';
-    import { eventBus, EVENTS } from '../../../../eventBus';
+    import { eventBus, EVENTS } from '../../../../config/eventBus';
 
     export default {
         name: 'EditorMode',

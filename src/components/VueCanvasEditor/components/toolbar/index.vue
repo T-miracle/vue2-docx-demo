@@ -22,7 +22,7 @@
 
 <script>
     import { toolbarMenuList, toolbarMenu } from './defaultToolbarMenu';
-    import { eventBus, EVENTS } from '../../eventBus';
+    import { eventBus, EVENTS } from '../../config/eventBus';
     import { ControlState } from '@hufe921/canvas-editor';
 
     export default {

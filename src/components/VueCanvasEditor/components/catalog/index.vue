@@ -11,7 +11,7 @@
 </template>
 
 <script>
-    import { eventBus, EVENTS } from '../../eventBus';
+    import { eventBus, EVENTS } from '../../config/eventBus';
     import { nextTick } from '../../utils/common';
 
     export default {

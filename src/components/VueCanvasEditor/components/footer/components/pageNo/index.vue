@@ -3,7 +3,7 @@
 </template>
 
 <script>
-    import { eventBus, EVENTS } from '../../../../eventBus';
+    import { eventBus, EVENTS } from '../../../../config/eventBus';
 
     export default {
         name: 'PageNo',

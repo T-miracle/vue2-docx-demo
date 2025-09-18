@@ -1,6 +1,6 @@
 import { EditorZone, ElementType } from '@hufe921/canvas-editor';
-import { Dialog } from './components/dialog';
-import { Signature } from './components/signature';
+import { Dialog } from '../components/dialog';
+import { Signature } from '../components/signature';
 
 export const contextMenu = {
     // 批注

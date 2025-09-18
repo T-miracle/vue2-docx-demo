@@ -4,33 +4,31 @@
         <Catalog></Catalog>
         <div ref="editor" class="editor"></div>
         <Footer></Footer>
-        <div style="position: absolute; width: auto; height: auto; top: 400px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 1000; align-items: center;">
-            <button @click="importFile({ instance: editorInstance })">导入</button>
-            <button @click="exportFile({ instance: editorInstance })">导出</button>
-            <button @click="convertToHTML">转换成HTML</button>
-            <button @click="convertToDocx">转换成docx</button>
+        <div class="test-button">
+            <button @click="importDocx">导入</button>
+            <button @click="exportDocx">导出</button>
+            <button @click="exportFileTmp({ instance: editorInstance })">导出Tmp</button>
+            <button @click="docxTestDemo">测试docx</button>
             <input ref="fileRef" type="file" accept=".docx" style="display: none;">
         </div>
     </div>
 </template>
 
 <script>
-    import Editor from '@hufe921/canvas-editor';
+    import Editor, { getElementListByHTML } from '@hufe921/canvas-editor';
     import Toolbar from './components/toolbar/index.vue';
     import Footer from './components/footer/index.vue';
     import Catalog from './components/catalog/index.vue';
     import docxPlugin from './utils/docx/index';
-    import { defaultEditorOptions } from './defaultOptions';
-    import { eventBus, EVENTS } from './eventBus';
-    import { contextMenu } from './contextMenu';
-    import shortcut from '@/components/VueCanvasEditor/shortcut';
-    import { importFile } from '@/components/VueCanvasEditor/utils/importFile';
-    import { exportFile } from '@/components/VueCanvasEditor/utils/exportFile';
+    import { defaultEditorOptions } from './config/defaultOptions';
+    import { eventBus, EVENTS } from './config/eventBus';
+    import { contextMenu } from './config/contextMenu';
+    import shortcut from './config/shortcut';
+    import { exportFile, exportFileTmp } from './utils/exportFile';
     import { debounce } from './utils/common';
-    import demoData from '@/components/VueCanvasEditor/demoData';
-    import { toDocx, toHtml } from 'docshift';
-    import { toHtml as myToHtml } from '@/components/VueCanvasEditor/utils/docx/importDocx';
-    import { convertImgBlobsInHtml } from '@/components/VueCanvasEditor/utils/htmlImageBlobConvertToBase64';
+    import { toHtml } from 'docshift';
+    import { convertImgBlobsInHtml } from './utils/imageConvert';
+    import { docxTestDemo } from './utils/docx/docx-test-demo';
 
     export default {
         name: 'VueCanvasEditor',
@@ -60,9 +58,6 @@
             window?.addEventListener('click', this.closeAllOptionsHandler, {
                 capture: true
             });
-
-            // 测试数据
-            this.setHTMLContent(demoData);
         },
         beforeDestroy() {
             window?.removeEventListener('click', this.closeAllOptionsHandler, {
@@ -74,8 +69,8 @@
             }
         },
         methods: {
-            exportFile,
-            importFile,
+            exportFileTmp,
+            docxTestDemo,
             /** 初始化编辑器 */
             init() {
                 const instance = new Editor(this.$refs.editor, [], defaultEditorOptions);
@@ -142,60 +137,68 @@
             },
             /**
              * 设置HTML内容
-             * @param {Partial<IEditorHTML>} payload
+             * @param payload
              */
             setHTMLContent(payload) {
                 if (!this.editorInstance) {
                     return;
                 }
-                this.editorInstance.command.executeSetHTML(payload);
+                const { width, margins } = this.editorInstance.command.getOptions();
+                const elements = {
+                    header: getElementListByHTML(payload.header || ''),
+                    main: getElementListByHTML(payload.main || '', { innerWidth: width - margins[1] - margins[3] }),
+                    footer: getElementListByHTML(payload.footer || '')
+                };
+                // console.log('elements: ', elements);
+                this.editorInstance.command.executeSetValue(elements);
             },
-            convertToHTML() {
+            importDocx() {
                 this.$refs.fileRef.click();
                 this.$refs.fileRef.onchange = async(e) => {
                     const file = e.target.files[0];
                     if (!file) {
                         return;
                     }
-                    console.log('file: ', file);
                     let html = await toHtml(file);
-                    html = html.replaceAll('text-align:distribute', 'text-align:justify')
+                    html = html.replaceAll('text-align:distribute', 'text-align:justify-all');
+                    html = html.replaceAll('text-align:both', 'text-align:justify');
                     html = await convertImgBlobsInHtml(html);
-                    console.log('html: ', html);
-
-                    let myHtml = await myToHtml(file)
-                    console.log('my html: ', myHtml);
+                    // console.log('html: ', html);
 
                     this.setHTMLContent({
                         main: html
                     });
                 };
             },
-            async convertToDocx() {
-                const htmlAll = await this.editorInstance.command.getHTML();
-                console.log('htmlAll: ', htmlAll);
-                let html = htmlAll.main
-                // html = html.replaceAll('<br>','<br/>')
-                // html = html.replaceAll('text-align: justify', 'text-align:distribute')
-                console.log('html: ', html);
-                // const docxBlob = await toDocx(html);
-                // const url = URL.createObjectURL(docxBlob);
-                // const a = document.createElement('a');
-                // a.href = url;
-                // a.download = 'document.docx';
-                // a.click();
-                // URL.revokeObjectURL(url);
+            exportDocx() {
+                exportFile({ instance: this.editorInstance })
             }
         }
     };
 </script>
 
 <style scoped lang="scss">
-    @import "./index.css";
+    @import "styles/index.css";
 
     .canvas-editor__container {
         position: relative;
         width: 100%;
         height: 100%;
+
+        .test-button {
+            position: fixed;
+            top: 16px;
+            right: 20px;
+            width: auto;
+            height: auto;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+            align-items: center;
+
+            button {
+                padding: 0 10px;
+            }
+        }
     }
 </style>
