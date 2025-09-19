@@ -11,7 +11,7 @@ export function textConvert(element) {
         font: element.font,
         text: element.value.toString(),
         bold: element.bold,
-        size: `${ (element.size || 16) / 0.75 }pt`,
+        size: `${ (element.size || 16) / 0.6 }pt`,
         color: Color(element.color).hex() || '#000000',
         italics: element.italic,
         strike: element.strikeout,

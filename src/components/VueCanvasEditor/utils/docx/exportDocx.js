@@ -2,23 +2,21 @@ import {
     Document,
     Packer,
     AlignmentType,
-    LevelFormat,
+    LevelFormat
 } from 'docx';
 import { convertPxToSize, saveAs } from './utils';
 import { toDocx } from './converter';
 import xmlJs from 'xml-js';
 
-export default function (command) {
-    return async function (options) {
+export default function(command) {
+    return async function(options) {
         const { fileName } = options;
         const { data: { header, main, footer } } = command.getValue();
-        // console.log('command.getValue()', command.getValue());
-        // console.log('----------HTML----------');
-        console.log(htmlToXmlJson(command.getHTML().main));
+        htmlToXmlJson(command.getHTML().main);
         console.log('----------主界面内容----------');
         console.log(main);
         console.log('------------------------\n\n');
-        const [top, right, bottom, left] = command.getOptions().margins;
+        const [ top, right, bottom, left ] = command.getOptions().margins;
         const doc = new Document({
             sections: [
                 {
@@ -79,20 +77,19 @@ export default function (command) {
 
 function htmlToXmlJson(html) {
     // 包裹根节点
-    let fixed = `<root>${html}</root>`;
-
-    console.log("原始 HTML:", fixed.toString());
-
+    let fixed = `<root>${ html }</root>`;
     // 转换常见 HTML 空标签为自闭合（这里只处理一些常见的，必要时可补充）
-    fixed = htmlToStrictXml(fixed)
-
-    console.log("转换后的 XML:", fixed.toString());
+    fixed = htmlToStrictXml(fixed);
+    console.log({
+        '转换前': html.toString(),
+        '转换后': fixed.toString()
+    });
 
     // 使用 xml-js 转换
     try {
         return xmlJs.xml2js(fixed, { compact: false, spaces: 2 });
     } catch (err) {
-        console.error("解析失败:", err.message);
+        console.error('解析失败:', err.message);
         return null;
     }
 }
@@ -106,24 +103,26 @@ function htmlToStrictXml(html) {
     function nodeToXml(node) {
         if (node.nodeType === Node.TEXT_NODE) {
             return node.nodeValue
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;");
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
         }
-        if (node.nodeType !== Node.ELEMENT_NODE) return '';
+        if (node.nodeType !== Node.ELEMENT_NODE) {
+            return '';
+        }
 
         const tagName = node.tagName.toLowerCase();
         const attrs = Array.from(node.attributes)
-            .map(attr => `${attr.name}="${attr.value}"`)
+            .map(attr => `${ attr.name }="${ attr.value }"`)
             .join(' ');
 
-        const openTag = attrs ? `<${tagName} ${attrs}>` : `<${tagName}>`;
+        const openTag = attrs ? `<${ tagName } ${ attrs }>` : `<${ tagName }>`;
 
         // 递归处理子节点
         const childrenXml = Array.from(node.childNodes).map(nodeToXml).join('');
 
         // 如果没有子节点，也强制闭合
-        return `${openTag}${childrenXml}</${tagName}>`;
+        return `${ openTag }${ childrenXml }</${ tagName }>`;
     }
 
     // 处理 body 内的内容

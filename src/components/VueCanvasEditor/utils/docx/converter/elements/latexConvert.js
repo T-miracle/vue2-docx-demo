@@ -5,5 +5,5 @@ import { MathRun } from 'docx';
  * @param element
  */
 export function latexConvert(element) {
-    new MathRun(element.value);
+    return new MathRun(element.value);
 }

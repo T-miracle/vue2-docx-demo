@@ -10,7 +10,8 @@ export function linkConvert(element) {
         children: [
             new TextRun({
                 text: element.valueList?.map(child => child.value).join(''),
-                style: 'Hyperlink'
+                style: 'Hyperlink',
+                size: `${ (element.size || 16) / 0.6 }pt`,
             })
         ],
         link: element.url

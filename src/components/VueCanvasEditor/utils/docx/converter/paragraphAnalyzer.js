@@ -1,15 +1,13 @@
 import { ElementType } from '@hufe921/canvas-editor';
 import { titleConvert } from './elements/titleConvert';
-import { textConvert } from './elements/textConvert';
 import { breakConvert } from './elements/breakConvert';
 import { Paragraph } from 'docx';
 import { rowFlexToAlignmentType } from './utils/map';
 import { parseText } from './utils/textAnalyze';
 import { tableConvert } from './elements/tableConvert';
 import { dateConvert } from './elements/dateConvert';
-import { imageConvert } from '@/components/VueCanvasEditor/utils/docx/converter/elements/imageConvert';
-import { linkConvert } from '@/components/VueCanvasEditor/utils/docx/converter/elements/linkConvert';
-import { paragraphChildrenConvert } from '@/components/VueCanvasEditor/utils/docx/converter/paragraphChildrenConvert';
+import { paragraphChildrenConvert } from './paragraphChildrenConvert';
+import { listConvert } from '@/components/VueCanvasEditor/utils/docx/converter/elements/listConvert';
 
 /**
  * 将元素列表进行段落分析，组装成 docx 段落对象列表
@@ -47,7 +45,10 @@ export function paragraphAnalyzer(elementList) {
             currentParagraphChildList = [];
             currentAlignment = null;
         } else if (element.type === ElementType.LIST) { // 列表
-
+            saveCurrentParagraph()
+            paragraphList.push(...listConvert(element));
+            currentParagraphChildList = [];
+            currentAlignment = null;
         } else if (element.type === ElementType.TABLE) { // 表格
             saveCurrentParagraph()
             paragraphList.push(tableConvert(element))
