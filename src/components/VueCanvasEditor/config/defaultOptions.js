@@ -1,8 +1,8 @@
-
 import { RenderMode } from '@hufe921/canvas-editor';
 
 /* 默认编辑器配置选项 */
 export const defaultEditorOptions =  {
+    scrollContainerSelector: '.canvas-editor__scroll-container',
     // 默认字体
     defaultFont: '宋体',
     // 默认字号

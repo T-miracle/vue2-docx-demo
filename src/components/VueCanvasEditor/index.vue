@@ -2,13 +2,15 @@
     <div class="canvas-editor__container">
         <Toolbar></Toolbar>
         <Catalog></Catalog>
-        <div ref="editor" class="editor"></div>
+        <div class="canvas-editor__scroll-container">
+            <div ref="editor" class="editor"></div>
+        </div>
         <Footer></Footer>
         <div class="test-button">
             <button @click="importDocx">导入</button>
             <button @click="exportDocx">导出</button>
-            <button @click="exportFileTmp({ instance: editorInstance })">导出Tmp</button>
-            <button @click="docxTestDemo">测试docx</button>
+            <!--<button @click="exportFileTmp({ instance: editorInstance })">导出Tmp</button>-->
+            <!--<button @click="docxTestDemo">测试docx</button>-->
             <input ref="fileRef" type="file" accept=".docx" style="display: none;">
         </div>
     </div>
@@ -73,7 +75,11 @@
             docxTestDemo,
             /** 初始化编辑器 */
             init() {
-                const instance = new Editor(this.$refs.editor, [], defaultEditorOptions);
+                const instance = new Editor(
+                    this.$refs.editor,
+                    [],
+                    defaultEditorOptions
+                );
                 instance.use(docxPlugin);
                 this.editorInstance = instance;
 
@@ -184,9 +190,11 @@
         position: relative;
         width: 100%;
         height: 100%;
+        display: flex;
+        flex-direction: column;
 
         .test-button {
-            position: fixed;
+            position: absolute;
             top: 16px;
             right: 20px;
             width: auto;
